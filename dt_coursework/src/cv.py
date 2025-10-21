@@ -55,7 +55,7 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
             pass_limit = int(np.median(inner_passes))
             chosen_passes.append(pass_limit)
 
-            outer_tree, _ = decision_tree_learning(X_train, y_train, depth=0)
+            outer_tree, _ = decision_tree_learning(X_train, y_train, depth=0)  ######---->>> WHAT"S THIS FOR?
             # Use 20% of outer training as validation to perform the passes
             # (reduced-error pruning requires a validation set to measure error during each pass)
             # We create a stratified-ish split by shuffling indices.
@@ -66,8 +66,8 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
             tr_idx = perm[val_size:]
             X_tr_sub, y_tr_sub = X_train[tr_idx], y_train[tr_idx]
             X_val_sub, y_val_sub = X_train[val_idx], y_train[val_idx]
-            # Fit on the sub-train used to define node counts and structure
-            outer_tree, _ = decision_tree_learning(X_tr_sub, y_tr_sub, depth=0)
+            # Fit on the sub-train used to define node counts and structure 
+            outer_tree, _ = decision_tree_learning(X_tr_sub, y_tr_sub, depth=0) ######---->>> THE PREVIOUS outer_tree GOT REPLACED BEFORE EVEN BEING USED
             # Apply chosen number of passes measured on X_val_sub
             pruned_tree = prune_with_passes(outer_tree, X_val_sub, y_val_sub, pass_limit)
 
