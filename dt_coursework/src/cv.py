@@ -6,6 +6,21 @@ from .metrics import confusion_matrix, metrics_summary
 from .prune import count_passes_to_converge, prune_with_passes
 
 def kfold_indices(n, k=10, seed=42, shuffle=True):
+    '''
+    Input:
+        n: total number of samples in the dataset
+        k: the number of groups/folds into which the dataset is divided
+        seed: starting state for generating random numbers of np.random.default_rng(), ensuring a reproducible randomized dataset sequence
+        shuffle: boolean of indicator to shuffle the array of dataset indices 
+    Process:
+        Generate a list of random sequence of number/indices [0..n-1] 
+        Split the list into k-number of equal-sized sublist
+    Return:
+        List of k tupels containing:
+            1. list of indices of training dataset (n*(k-1)/k number of indices)
+            2. list of indices of test/validation dataset (n/k number of indices)
+    '''
+
     rng = np.random.default_rng(seed)
     indices = np.arange(n)
     if shuffle:
@@ -14,12 +29,57 @@ def kfold_indices(n, k=10, seed=42, shuffle=True):
     return [(np.concatenate([folds[j] for j in range(k) if j != i]), folds[i]) for i in range(k)]
 
 def evaluate_tree_on_split(X_train, y_train, X_test, y_test, labels):
+    '''
+    Input:
+        X_train: Array of features of the train dataset
+        y_train: Array of class of the train dataset
+        X_test: Array of features of the test dataset
+        y_test: Array of class of the test dataset
+        labels: Array of all unique class labels in the dataset
+    Process:
+        Create a decision tree from training dataset (X_train and y_train)
+        Evaluate the decision tree using the test dataset (X_test and y_test)
+        Calculate a confusion matrix
+    Return:
+        tuple of:
+            1. Decision tree model
+            2. Decision tree depth
+            3. Confusion matrix of the test dataset
+    '''
+
     tree, max_depth = decision_tree_learning(X_train, y_train, depth=0)
     y_pred = predict(tree, X_test)
     cm = confusion_matrix(y_test, y_pred, labels)
     return tree, max_depth, cm
 
 def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
+    '''
+    Input:
+        X: Array of features of the dataset
+        y: Array of class of the dataset
+        k: the number of groups/folds into which the dataset is divided (into training and test dataset)
+        seed: starting state for generating random numbers of np.random.default_rng(), ensuring a reproducible randomized dataset sequence
+        prune and nested: boolean of indicator to evaluate the k-fold decision tree pruning
+        inner_k: the number of groups/folds into which the training dataset is divided (into training and validation dataset) 
+    Process:
+        1. Do k-number of decision tree learning using n*(k-1)/k training dataset
+        2. Evaluate each decision tree using n/k number of test dataset
+        3. If prune and nested is true, then do the pruning cross validation (k * (k-1) folds) to result the best hyperparameter (number of pruned node in the tree).
+            Dataset splitted into:
+                - n*(k-2)/k training dataset
+                - n/k validation dataset
+                - n/k training dataset
+            Choosen hyperparameter: median of number of pruning which resulting to the best accuracy in each fold            
+    Return:
+        Evaluation result of the cross validation, contains:
+            1. Confusion matrix
+            2. Accuracy
+            3. array of precision (per class)
+            4. array of recall (per class)
+            5. array F1 (per class)
+        If the prune and nested value is True, then the results will contains the result of not-pruned tree and result of pruned tree
+    '''
+
     """Return aggregate metrics and depth stats.
     If prune & nested: inner CV estimates #passes to apply on outer training fold.
     """
