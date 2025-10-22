@@ -1,3 +1,4 @@
 .DS_Store
 /dt_coursework/src/__pycache__/*
 /outputs/*
+/venv/*
