@@ -7,70 +7,78 @@ from .prune import count_passes_to_converge, prune_with_passes
 
 def kfold_indices(n, k=10, seed=42, shuffle=True):
     '''
-    Input:
-        n: total number of samples in the dataset
-        k: the number of groups/folds into which the dataset is divided
-        seed: starting state for generating random numbers of np.random.default_rng(), ensuring a reproducible randomized dataset sequence
-        shuffle: boolean of indicator to shuffle the array of dataset indices 
-    Process:
-        Generate a list of random sequence of number/indices [0..n-1] 
-        Split the list into k-number of equal-sized sublist
-    Return:
-        List of tupels containing k training and test validation indices 
+    parameters:
+        n (int): total number of samples in the dataset
+        k (int): number of groups/folds to divide the dataset into
+        seed (int): random seed for np.random.default_rng() to ensure reproducibility
+        shuffle (bool): whether to shuffle the dataset indices before splitting
+
+    functionality:
+        Generate indices [0..n-1], shuffle if needed, and split them into k folds.
+
+    return:
+        list of tuples: each tuple contains (train_indices, test_indices)
     '''
 
-    rng = np.random.default_rng(seed)
-    indices = np.arange(n)
+    rng = np.random.default_rng(seed)  # initialize random number generator
+    indices = np.arange(n)  # create array [0, 1, ..., n-1]
+
     if shuffle:
-        rng.shuffle(indices)
-    folds = np.array_split(indices, k)
+        rng.shuffle(indices)  # shuffle indices if requested
 
-    '''
-    return is list of tuples contain:
-        1. list of indices of training dataset (n*(k-1)/k number of indices)
-        2. list of indices of test/validation dataset (n/k number of indices)
-    '''
-    return [(np.concatenate([folds[j] for j in range(k) if j != i]), folds[i]) for i in range(k)]
+    folds = np.array_split(indices, k)  # split indices into k equal parts
+
+    # create list of (train, test) index pairs for each fold
+    return [
+        (np.concatenate([folds[j] for j in range(k) if j != i]), folds[i])
+        for i in range(k)
+    ]
 
 def evaluate_tree_on_split(X_train, y_train, X_test, y_test, labels):
     '''
-    Input:
-        X_train: Array of features of the train dataset
-        y_train: Array of class of the train dataset
-        X_test: Array of features of the test dataset
-        y_test: Array of class of the test dataset
-        labels: Array of all unique class labels in the dataset
-    Process:
-        Create a decision tree from training dataset (X_train and y_train)
-        Evaluate the decision tree using the test dataset (X_test and y_test)
-        Calculate a confusion matrix
-    Return:
-        tuple of:
-            1. Decision tree model
-            2. Decision tree depth
-            3. Confusion matrix of the test dataset
+    parameters:
+        X_train (ndarray): feature matrix of the training dataset
+        y_train (ndarray): class labels for the training dataset
+        X_test (ndarray): feature matrix of the test dataset
+        y_test (ndarray): class labels for the test dataset
+        labels (ndarray): array of all unique class labels in the dataset
+
+    functionality:
+        Train a decision tree using the training data and evaluate it on the test data.
+        Compute the confusion matrix for performance evaluation.
+
+    return:
+        tuple: (trained decision tree, tree depth, confusion matrix)
     '''
 
+    # train the decision tree and get its maximum depth
     tree, max_depth = decision_tree_learning(X_train, y_train, depth=0)
+
+    # predict labels for the test dataset
     y_pred = predict(tree, X_test)
+
+    # compute confusion matrix using true and predicted labels
     cm = confusion_matrix(y_test, y_pred, labels)
+
     return tree, max_depth, cm
+
 
 def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
     '''
-    Input:
-        X: Array of features of the dataset
-        y: Array of class of the dataset
-        k: the number of groups/folds into which the dataset is divided (into training and test dataset)
-        seed: starting state for generating random numbers of np.random.default_rng(), ensuring a reproducible randomized dataset sequence
-        prune and nested: boolean of indicator to evaluate the k-fold decision tree pruning
-        inner_k: the number of groups/folds into which the training dataset is divided (into training and validation dataset) 
-    Process:
-        1. Do k-number of decision tree learning using n*(k-1)/k training dataset & evaluate
-        2. Evaluate each decision tree using n/k number of test dataset
-        3. If prune and nested is true, do the pruning cross validation (k * (k-1) folds) to result the best hyperparameter (number of pruned node in the tree).
-    Return:
-        Evaluation result of the cross validation and and evaluation result of the pruning cross validation
+    parameters:
+        X (ndarray): feature matrix of the dataset
+        y (ndarray): class labels of the dataset
+        k (int): number of outer folds (train/test)
+        seed (int): random seed for reproducibility
+        prune (bool): whether to apply pruning
+        nested (bool): whether to use nested CV to choose pruning passes
+        inner_k (int): number of inner folds (train/validation) when nested is True
+
+    functionality:
+        Run k-fold CV to train/evaluate decision trees; optionally run nested CV to pick pruning passes (hyperparameter), then prune and re-evaluate.
+
+    return:
+        dict: aggregate confusion/metrics (before), depth stats, and if pruning is used, corresponding "after" results and chosen passes
     '''
 
     """Return aggregate metrics and depth stats.
@@ -95,14 +103,7 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
         depths_before.append(depth_before)
 
         if prune and nested:
-            # Inner CV to estimate number of pruning passes
-            '''
-            Dataset splitted into:
-                - n*(k-2)/k training dataset
-                - n/k validation dataset
-                - n/k training dataset
-            Choosen hyperparameter: median of number of pruning which resulting to the best accuracy in each fold            
-            '''
+            # Inner CV to estimate a robust number of pruning passes (median over folds)
             inner = kfold_indices(len(y_train), k=inner_k, seed=seed+outer_i+1, shuffle=True)
             inner_passes = []
             for (inner_tr_idx, inner_val_idx) in inner:
@@ -115,10 +116,8 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
             pass_limit = int(np.median(inner_passes))
             chosen_passes.append(pass_limit)
 
-            outer_tree, _ = decision_tree_learning(X_train, y_train, depth=0)  ######---->>> WHAT"S THIS FOR?
-            # Use 20% of outer training as validation to perform the passes
-            # (reduced-error pruning requires a validation set to measure error during each pass)
-            # We create a stratified-ish split by shuffling indices.
+            outer_tree, _ = decision_tree_learning(X_train, y_train, depth=0)  # placeholder; refit below on sub-train
+            # Use 20% of outer training as validation for reduced-error pruning
             rng = np.random.default_rng(seed + 1337 + outer_i)
             perm = rng.permutation(len(y_train))
             val_size = max(1, len(y_train)//5)
@@ -126,15 +125,13 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
             tr_idx = perm[val_size:]
             X_tr_sub, y_tr_sub = X_train[tr_idx], y_train[tr_idx]
             X_val_sub, y_val_sub = X_train[val_idx], y_train[val_idx]
-            # Fit on the sub-train used to define node counts and structure 
-            outer_tree, _ = decision_tree_learning(X_tr_sub, y_tr_sub, depth=0) ######---->>> THE PREVIOUS outer_tree GOT REPLACED BEFORE EVEN BEING USED
-            # Apply chosen number of passes measured on X_val_sub
+            # Fit on sub-train to define structure; then prune using validation
+            outer_tree, _ = decision_tree_learning(X_tr_sub, y_tr_sub, depth=0)  # intentionally replaces previous outer_tree
             pruned_tree = prune_with_passes(outer_tree, X_val_sub, y_val_sub, pass_limit)
 
             y_pred_after = predict(pruned_tree, X_test)
             depths_after.append(tree_max_depth(pruned_tree))
-            # For 'after', we overwrite the confusion addition we already made with unpruned?
-            # The spec wants post-pruning metrics separately, so we'll return separately.
+            # Post-pruning metrics will be collected in the "after" pass below.
         else:
             y_pred_after = y_pred_before
             depths_after.append(depth_before)
@@ -150,7 +147,7 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
     }
 
     if prune and nested:
-        # Need a second pass to compute AFTER metrics with pruning using the same outer folds
+        # Second pass: compute "after" metrics with pruning using same outer folds
         agg_cm_after = np.zeros_like(agg_cm)
         depths_after = []
         chosen_passes = []
@@ -159,7 +156,7 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
             X_train, y_train = X[train_idx], y[train_idx]
             X_test, y_test = X[test_idx], y[test_idx]
 
-            # Inner CV again (same seed path -> same choice deterministically)
+            # Inner CV again (same seed path -> deterministic choice)
             inner = kfold_indices(len(y_train), k=inner_k, seed=seed+outer_i+1, shuffle=True)
             inner_passes = []
             for (inner_tr_idx, inner_val_idx) in inner:

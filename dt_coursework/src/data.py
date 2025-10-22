@@ -3,18 +3,19 @@ import numpy as np
 
 def load_wifi_dataset(path):
     '''
-    Input:
-        path: path of the file (txt format) to load
-    Process:
-        Lad the file into 2 arrays:
-            X: the dataset features
-            y: the dataset class/label (the last column of the dataset) 
-    Return:
-        Tuple of array of feature (X) and array of class (Y)
+    parameters:
+        path (str): path to the dataset file in .txt format
+
+    functionality:
+        Load the dataset from a text file and split it into features (X) and labels (y).
+
+    return:
+        tuple: (X, y) where X is the feature array and y is the class/label array
     '''
-    arr = np.loadtxt(path)
-    X = arr[:, :-1].astype(float)
-    y = arr[:, -1].astype(int)
+
+    arr = np.loadtxt(path)  # load data from text file
+    X = arr[:, :-1].astype(float)  # all columns except last = features
+    y = arr[:, -1].astype(int)     # last column = labels
     return X, y
 
 if __name__ == "__main__":
