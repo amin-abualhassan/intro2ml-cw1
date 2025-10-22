@@ -16,9 +16,7 @@ def kfold_indices(n, k=10, seed=42, shuffle=True):
         Generate a list of random sequence of number/indices [0..n-1] 
         Split the list into k-number of equal-sized sublist
     Return:
-        List of k tupels containing:
-            1. list of indices of training dataset (n*(k-1)/k number of indices)
-            2. list of indices of test/validation dataset (n/k number of indices)
+        List of tupels containing k training and test validation indices 
     '''
 
     rng = np.random.default_rng(seed)
@@ -26,6 +24,12 @@ def kfold_indices(n, k=10, seed=42, shuffle=True):
     if shuffle:
         rng.shuffle(indices)
     folds = np.array_split(indices, k)
+
+    '''
+    return is list of tuples contain:
+        1. list of indices of training dataset (n*(k-1)/k number of indices)
+        2. list of indices of test/validation dataset (n/k number of indices)
+    '''
     return [(np.concatenate([folds[j] for j in range(k) if j != i]), folds[i]) for i in range(k)]
 
 def evaluate_tree_on_split(X_train, y_train, X_test, y_test, labels):
@@ -62,22 +66,11 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
         prune and nested: boolean of indicator to evaluate the k-fold decision tree pruning
         inner_k: the number of groups/folds into which the training dataset is divided (into training and validation dataset) 
     Process:
-        1. Do k-number of decision tree learning using n*(k-1)/k training dataset
+        1. Do k-number of decision tree learning using n*(k-1)/k training dataset & evaluate
         2. Evaluate each decision tree using n/k number of test dataset
-        3. If prune and nested is true, then do the pruning cross validation (k * (k-1) folds) to result the best hyperparameter (number of pruned node in the tree).
-            Dataset splitted into:
-                - n*(k-2)/k training dataset
-                - n/k validation dataset
-                - n/k training dataset
-            Choosen hyperparameter: median of number of pruning which resulting to the best accuracy in each fold            
+        3. If prune and nested is true, do the pruning cross validation (k * (k-1) folds) to result the best hyperparameter (number of pruned node in the tree).
     Return:
-        Evaluation result of the cross validation, contains:
-            1. Confusion matrix
-            2. Accuracy
-            3. array of precision (per class)
-            4. array of recall (per class)
-            5. array F1 (per class)
-        If the prune and nested value is True, then the results will contains the result of not-pruned tree and result of pruned tree
+        Evaluation result of the cross validation and and evaluation result of the pruning cross validation
     '''
 
     """Return aggregate metrics and depth stats.
@@ -103,6 +96,13 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
 
         if prune and nested:
             # Inner CV to estimate number of pruning passes
+            '''
+            Dataset splitted into:
+                - n*(k-2)/k training dataset
+                - n/k validation dataset
+                - n/k training dataset
+            Choosen hyperparameter: median of number of pruning which resulting to the best accuracy in each fold            
+            '''
             inner = kfold_indices(len(y_train), k=inner_k, seed=seed+outer_i+1, shuffle=True)
             inner_passes = []
             for (inner_tr_idx, inner_val_idx) in inner:
