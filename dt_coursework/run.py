@@ -125,4 +125,4 @@ def main():
         run_one(path, name, args.k, args.seed, args.make_figures)
 
 if __name__ == '__main__':
-    main()  # entry point
+    main()

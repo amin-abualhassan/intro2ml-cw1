@@ -5,16 +5,18 @@ from .utils import unique_labels, label_counts, information_gain
 
 Node = Dict[str, Any]
 
-'''
-parameters:
-  x (1D np.ndarray), y (1D array-like), labels (array-like)
-functionality:
-  For one feature, scan valid split points and pick the threshold with max information gain.
-return:
-  (best_gain: float, best_threshold: float|None)
-'''
+
 def _best_split_for_feature(x, y, labels):
-    """Return (gain, threshold) for a single feature vector x and labels y."""
+    '''
+    parameters:
+    x (1D np.ndarray), y (1D array-like), labels (array-like)
+
+    functionality:
+    For one feature, scan valid split points and pick the threshold with max information gain.
+    
+    return:
+    (best_gain: float, best_threshold: float|None)
+    '''
     n = len(y)
     order = np.argsort(x, kind="mergesort")  # stable sort preserves order on ties
     x_sorted = x[order]
@@ -48,16 +50,17 @@ def _best_split_for_feature(x, y, labels):
     return best_gain if best_gain > 0 else 0.0, best_thr
 
 
-'''
-parameters:
-  X (2D np.ndarray), y (1D array-like), labels (array-like)
-functionality:
-  Evaluate all features with the single-feature splitter; keep the best (attr, threshold, gain).
-return:
-  (best_attr: int|None, best_threshold: float|None, best_gain: float)
-'''
 def find_split(X, y, labels):
-    """Search over all features; return (best_attr, best_threshold, best_gain)."""
+    '''
+    parameters:
+    X (2D np.ndarray), y (1D array-like), labels (array-like)
+
+    functionality:
+    Evaluate all features with the single-feature splitter; keep the best (attr, threshold, gain).
+    
+    return:
+    (best_attr: int|None, best_threshold: float|None, best_gain: float)
+    '''
     n_features = X.shape[1]
     best = (None, None, 0.0)  # (attr, thr, gain)
     for j in range(n_features):
@@ -67,15 +70,17 @@ def find_split(X, y, labels):
     return best
 
 
-'''
-parameters:
-  y (1D array-like), depth (int)
-functionality:
-  Build a leaf node: predicted label, depth, per-class counts, and label list.
-return:
-  Node (dict)
-'''
 def make_leaf(y, depth):
+    '''
+    parameters:
+    y (1D array-like), depth (int)
+
+    functionality:
+    Build a leaf node: predicted label, depth, per-class counts, and label list.
+    
+    return:
+    Node (dict)
+    '''
     counts = label_counts(y)
     pred = int(np.argmax(counts) + 1)  # quick placeholder (labels assumed 1..K here)
 
@@ -92,18 +97,17 @@ def make_leaf(y, depth):
     }
 
 
-'''
-parameters:
-  X (2D np.ndarray), y (1D array-like), depth (int, default 0)
-functionality:
-  Recursively grow a decision tree using info gain. Stop on pure nodes or no useful split.
-return:
-  (node: Node, max_depth: int)
-'''
 def decision_tree_learning(X, y, depth=0) -> Tuple[Node, int]:
-    """Recursive decision tree learner for continuous features & multi-class labels.
-    Returns (node, max_depth).
-    """
+    '''
+    parameters:
+    X (2D np.ndarray), y (1D array-like), depth (int, default 0)
+
+    functionality:
+    Recursively grow a decision tree using info gain. Stop on pure nodes or no useful split.
+    
+    return:
+    (node: Node, max_depth: int)
+    '''
     labs = unique_labels(y)
 
     # Stop if pure (single label)
@@ -147,15 +151,17 @@ def decision_tree_learning(X, y, depth=0) -> Tuple[Node, int]:
     return node, max(l_depth, r_depth)
 
 
-'''
-parameters:
-  node (Node), x (1D np.ndarray)
-functionality:
-  Traverse the tree from root to leaf using thresholds; return the leaf prediction.
-return:
-  int (predicted label)
-'''
 def predict_one(node: Node, x):
+    '''
+    parameters:
+    node (Node), x (1D np.ndarray)
+
+    functionality:
+    Traverse the tree from root to leaf using thresholds; return the leaf prediction.
+    
+    return:
+    int (predicted label)
+    '''
     while not node.get("leaf", False):
         # Go left if value <= threshold; otherwise right
         if x[node["attr"]] <= node["threshold"]:
@@ -165,41 +171,47 @@ def predict_one(node: Node, x):
     return int(node["prediction"])
 
 
-'''
-parameters:
-  node (Node), X (2D np.ndarray)
-functionality:
-  Predict a label for each row of X using predict_one.
-return:
-  np.ndarray (dtype=int) of predictions
-'''
 def predict(node: Node, X: np.ndarray):
+    '''
+    parameters:
+    node (Node), X (2D np.ndarray)
+
+    functionality:
+    Predict a label for each row of X using predict_one.
+    
+    return:
+    np.ndarray (dtype=int) of predictions
+    '''
     return np.array([predict_one(node, row) for row in X], dtype=int)
 
 
-'''
-parameters:
-  node (Node)
-functionality:
-  Count total number of nodes in the tree (leaves + internals).
-return:
-  int
-'''
 def tree_size(node: Node):
+    '''
+    parameters:
+    node (Node)
+
+    functionality:
+    Count total number of nodes in the tree (leaves + internals).
+    
+    return:
+    int
+    '''
     if node.get("leaf", False):
         return 1
     return 1 + tree_size(node["left"]) + tree_size(node["right"])
 
 
-'''
-parameters:
-  node (Node)
-functionality:
-  Compute the maximum depth recorded in the tree.
-return:
-  int
-'''
 def tree_max_depth(node: Node):
+    '''
+    parameters:
+    node (Node)
+
+    functionality:
+    Compute the maximum depth recorded in the tree.
+
+    return:
+    int
+    '''
     if node.get("leaf", False):
         return node.get("depth", 0)
     return max(tree_max_depth(node["left"]), tree_max_depth(node["right"]))

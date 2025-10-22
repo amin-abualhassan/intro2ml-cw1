@@ -1,14 +1,16 @@
 import numpy as np
 
-'''
-parameters:
-  y (array-like)
-functionality:
-  Return a 1D int array of labels. Flattens input, drops NaNs, accepts numeric strings.
-return:
-  np.ndarray (int)
-'''
 def _coerce_to_int_labels(y):
+    '''
+    parameters:
+
+    y (array-like)
+
+    functionality:
+    Return a 1D int array of labels. Flattens input, drops NaNs, accepts numeric strings.
+    return:
+    np.ndarray (int)
+    '''
     y = np.asarray(y)
     if y.ndim != 1:
         y = y.ravel()  # ensure 1D
@@ -31,28 +33,32 @@ def _coerce_to_int_labels(y):
             raise TypeError("Labels must be numeric (or numeric strings).") from e
 
 
-'''
-parameters:
-  y (array-like)
-functionality:
-  Return sorted unique labels after robust int coercion.
-return:
-  np.ndarray (int)
-'''
 def unique_labels(y):
+    '''
+    parameters:
+
+    y (array-like)
+
+    functionality:
+    Return sorted unique labels after robust int coercion.
+    return:
+    np.ndarray (int)
+    '''
     y_int = _coerce_to_int_labels(y)  # normalize labels
     return np.unique(y_int)
 
 
-'''
-parameters:
-  y (array-like)
-functionality:
-  Return the most frequent label after int coercion. Ties go to the smallest label.
-return:
-  int
-'''
 def majority_label(y):
+    '''
+    parameters:
+
+    y (array-like)
+
+    functionality:
+    Return the most frequent label after int coercion. Ties go to the smallest label.
+    return:
+    int
+    '''
     y_int = _coerce_to_int_labels(y)
     if y_int.size == 0:
         raise ValueError("majority_label: empty label array after coercion.")
@@ -60,15 +66,17 @@ def majority_label(y):
     return int(vals[np.argmax(counts)])  # argmax on counts; ties pick first (smallest label)
 
 
-'''
-parameters:
-  y (array-like), labels (array-like or None)
-functionality:
-  Count how often each label in `labels` appears in y (after int coercion). If labels is None, use unique_labels(y).
-return:
-  np.ndarray (int) aligned with `labels`
-'''
 def label_counts(y, labels=None):
+    '''
+    parameters:
+
+    y (array-like), labels (array-like or None)
+
+    functionality:
+    Count how often each label in `labels` appears in y (after int coercion). If labels is None, use unique_labels(y).
+    return:
+    np.ndarray (int) aligned with `labels`
+    '''
     y_int = _coerce_to_int_labels(y)
 
     if labels is None:
@@ -94,15 +102,17 @@ def label_counts(y, labels=None):
     return out
 
 
-'''
-parameters:
-  counts (array-like of nonnegative numbers)
-functionality:
-  Compute Shannon entropy (base 2). Ignores zero counts. Returns 0 if total is 0.
-return:
-  float
-'''
 def entropy_from_counts(counts):
+    '''
+    parameters:
+
+    counts (array-like of nonnegative numbers)
+
+    functionality:
+    Compute Shannon entropy (base 2). Ignores zero counts. Returns 0 if total is 0.
+    return:
+    float
+    '''
     c = np.asarray(counts, dtype=float).ravel()  # 1D float array
     if c.size == 0:
         return 0.0
@@ -116,16 +126,18 @@ def entropy_from_counts(counts):
     return float(-(p * np.log2(p)).sum())
 
 
-'''
-parameters:
-  parent_counts, left_counts, right_counts (array-like of nonnegative numbers)
-functionality:
-  Information gain: H(parent) minus weighted child entropies. Returns 0 if a child is empty.
-  Uses child totals for weights if parent and children sums differ. Clips tiny negative IG to 0.
-return:
-  float
-'''
 def information_gain(parent_counts, left_counts, right_counts):
+    '''
+    parameters:
+
+    parent_counts, left_counts, right_counts (array-like of nonnegative numbers)
+
+    functionality:
+    Information gain: H(parent) minus weighted child entropies. Returns 0 if a child is empty.
+    Uses child totals for weights if sums differ. Clips tiny negative IG to 0.
+    return:
+    float
+    '''
     parent = np.asarray(parent_counts, dtype=float).ravel()
     left   = np.asarray(left_counts,   dtype=float).ravel()
     right  = np.asarray(right_counts,  dtype=float).ravel()
