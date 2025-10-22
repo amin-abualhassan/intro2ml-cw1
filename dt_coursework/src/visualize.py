@@ -9,38 +9,41 @@ def _layout_tidy(
     depth: int = 0,
     _leaf_counter: List[int] = None,
 ) -> Tuple[List[Tuple[Node, float, int]], float, float, float]:
-    """
-    - Input:
-        node (Node): The root node (or current subtree node) of the decision tree.
+    '''
+    parameters:
+        node (Node): Current or root node of the decision tree.
         depth (int): Current depth level in the tree. Default is 0.
-        _leaf_counter (List[int]): Internal counter used to assign x-coordinates to leaves in-order.
-    
-    - Process:
-        Recursively traverses the decision tree to compute a "tidy" layout.
-        Each leaf is assigned a unique x-coordinate based on its in-order position.
-        For internal nodes, the x-coordinate is the midpoint between its left and right children.
-    
-    - Return:
-        Tuple:
-            - positions (List[Tuple[Node, float, int]]): List of nodes with their x-coordinate and depth.
-            - xmin (float): Minimum x-coordinate among leaves.
-            - xmax (float): Maximum x-coordinate among leaves.
+        _leaf_counter (List[int]): Counter to assign x-coordinates to leaves in order.
+
+    functionality:
+        Recursively computes a clean, non-overlapping layout of the tree by assigning
+        x/y positions to each node based on in-order traversal.
+
+    return:
+        Tuple containing:
+            - positions (List[Tuple[Node, float, int]]): Node with its x-position and depth.
+            - xmin (float): Minimum x-coordinate among all leaves.
+            - xmax (float): Maximum x-coordinate among all leaves.
             - xcenter (float): Center x-coordinate of the current subtree.
-    """
+    '''
     if _leaf_counter is None:
         _leaf_counter = [0]
 
+    # Base case: if leaf node, assign x position and increment counter
     if node.get("leaf", False):
         x = float(_leaf_counter[0])
         _leaf_counter[0] += 1
         return [(node, x, depth)], x, x, x
 
-    # recurse (left, right)
+    # Recursively compute layout for left and right subtrees
     left_pos, lmin, lmax, lcen = _layout_tidy(node["left"], depth + 1, _leaf_counter)
     right_pos, rmin, rmax, rcen = _layout_tidy(node["right"], depth + 1, _leaf_counter)
 
+    # Compute x position as midpoint of left and right children
     xcenter = (lcen + rcen) / 2.0
     here = [(node, xcenter, depth)]
+
+    # Combine current node and children positions
     positions = left_pos + right_pos + here
     return positions, min(lmin, rmin), max(lmax, rmax), xcenter
 
@@ -56,49 +59,45 @@ def draw_tree(
     leaf_gap_units: float = 2.0,
     annotate_thresholds: bool = True,
 ):
-    """
-    - Input:
-        node (Node): Root node of the trained decision tree.
-        feature_names (List[str], optional): Names of the features for labeling internal nodes.
-        class_names (Dict[int, str], optional): Mapping from class indices to human-readable labels.
-        figsize (Tuple[float, float], optional): Custom figure size for the visualization.
-        filename (str, optional): Path to save the resulting tree plot.
-        x_spacing (float): Horizontal spacing multiplier between nodes.
-        y_spacing (float): Vertical spacing multiplier between levels.
+    '''
+    parameters:
+        node (Node): Root node of the decision tree to visualize.
+        feature_names (List[str], optional): List of feature names for internal nodes.
+        class_names (Dict[int, str], optional): Mapping from class indices to labels.
+        figsize (Tuple[float, float], optional): Figure size for the plot.
+        filename (str, optional): Path to save the visualization.
+        x_spacing (float): Horizontal spacing multiplier.
+        y_spacing (float): Vertical spacing multiplier.
         leaf_gap_units (float): Extra horizontal spacing between leaves.
-        annotate_thresholds (bool): Whether to show threshold values (≤ / >) on connecting edges.
-    
-    - Process:
-        Uses a tidy layout from '_layout_tidy()' to compute node coordinates.
-        Draws the decision tree using Matplotlib:
-            • Connects parent and child nodes with edges.
-            • Labels edges with threshold conditions if enabled.
-            • Displays nodes as boxes showing either feature names (internal nodes)
-              or class predictions (leaf nodes).
-        Optionally saves the figure to a file if 'filename' is provided.
-    
-    - Return:
+        annotate_thresholds (bool): If True, show threshold values on edges.
+
+    functionality:
+        Draws a complete visual representation of a decision tree using Matplotlib,
+        including nodes, edges, and threshold annotations. Uses tidy layout for positioning.
+
+    return:
         Tuple:
-            - fig (matplotlib.figure.Figure): The created figure object.
-            - ax (matplotlib.axes.Axes): The axis object containing the visualization.
-    """
+            - fig (matplotlib.figure.Figure): Created figure object.
+            - ax (matplotlib.axes.Axes): Axis object containing the tree plot.
+    '''
     if feature_names is None:
         feature_names = [f"A{i}" for i in range(7)]
     if class_names is None:
         class_names = {1: "Room 1", 2: "Room 2", 3: "Room 3", 4: "Room 4"}
 
+    # Get tidy layout positions for each node
     positions, xmin, xmax, _ = _layout_tidy(node, depth=0)
     n_leaves = int(xmax - xmin + 1)
 
-    # Auto figure size if not provided: widen with number of leaves
+    # Auto-adjust figure size if not provided
     if figsize is None:
         max_depth = max(d for _, _, d in positions)
-        w = max(14.0, n_leaves * 0.7 * (1.0 + leaf_gap_units))  # include leaf gaps
-        h = max(7.0,  (max_depth + 1) * 1.2)
+        w = max(14.0, n_leaves * 0.7 * (1.0 + leaf_gap_units))
+        h = max(7.0, (max_depth + 1) * 1.2)
         figsize = (w, h)
 
-    # Convert from leaf-index space to plot coords
-    unit = x_spacing * (1.0 + leaf_gap_units)  # <<< each adjacent leaf is farther apart
+    # Convert leaf index positions to actual plot coordinates
+    unit = x_spacing * (1.0 + leaf_gap_units)
     coords = {}
     for (n, x_idx, depth) in positions:
         x = (x_idx - xmin) * unit
@@ -108,7 +107,7 @@ def draw_tree(
     fig, ax = plt.subplots(figsize=figsize)
     ax.axis("off")
 
-    # Draw edges first
+    # Draw connecting edges
     for (n, _, _) in positions:
         if not n.get("leaf", False):
             x, y = coords[id(n)]
@@ -116,6 +115,8 @@ def draw_tree(
                 c = n[child_key]
                 cx, cy = coords[id(c)]
                 ax.plot([x, cx], [y, cy], linewidth=1.0)
+
+                # Optionally annotate thresholds on edges
                 if annotate_thresholds:
                     midx, midy = (x + cx) / 2.0, (y + cy) / 2.0
                     if side_label == "≤":
@@ -124,7 +125,7 @@ def draw_tree(
                         txt = f">{n['threshold']:.2f}"
                     ax.text(midx, midy + 0.12, txt, fontsize=8, ha="center", va="bottom")
 
-    # Draw nodes (after edges so boxes are on top)
+    # Draw nodes (boxes) after edges
     for (n, _, _) in positions:
         x, y = coords[id(n)]
         if n.get("leaf", False):
@@ -135,7 +136,8 @@ def draw_tree(
         bbox = dict(boxstyle="round,pad=0.35", fc="white", ec="black", lw=1)
         ax.text(x, y, txt, ha="center", va="center", fontsize=9, bbox=bbox)
 
+    # Save figure if filename provided
     if filename:
         fig.savefig(filename, dpi=150, bbox_inches="tight")
-    return fig, ax
 
+    return fig, ax
