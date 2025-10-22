@@ -10,13 +10,22 @@ def _layout_tidy(
     _leaf_counter: List[int] = None,
 ) -> Tuple[List[Tuple[Node, float, int]], float, float, float]:
     """
-    Tidy tree layout:
-    - Give every leaf a unique x index by in-order assignment.
-    - Set internal node x as the midpoint of its children's x.
-    Returns:
-      positions: list of (node, x_index, depth)
-      xmin, xmax: leaf-index bounds for this subtree
-      xcenter: center (in leaf-index units) for this subtree
+    - Input:
+        node (Node): The root node (or current subtree node) of the decision tree.
+        depth (int): Current depth level in the tree. Default is 0.
+        _leaf_counter (List[int]): Internal counter used to assign x-coordinates to leaves in-order.
+    
+    - Process:
+        Recursively traverses the decision tree to compute a "tidy" layout.
+        Each leaf is assigned a unique x-coordinate based on its in-order position.
+        For internal nodes, the x-coordinate is the midpoint between its left and right children.
+    
+    - Return:
+        Tuple:
+            - positions (List[Tuple[Node, float, int]]): List of nodes with their x-coordinate and depth.
+            - xmin (float): Minimum x-coordinate among leaves.
+            - xmax (float): Maximum x-coordinate among leaves.
+            - xcenter (float): Center x-coordinate of the current subtree.
     """
     if _leaf_counter is None:
         _leaf_counter = [0]
@@ -48,14 +57,30 @@ def draw_tree(
     annotate_thresholds: bool = True,
 ):
     """
-    Render a tidy binary tree with Matplotlib.
-
-    Parameters
-    ----------
-    x_spacing, y_spacing : float
-        Scale factors for horizontal / vertical space between nodes.
-    annotate_thresholds : bool
-        If True, draw '≤ threshold' on left edges and '>' on right edges.
+    - Input:
+        node (Node): Root node of the trained decision tree.
+        feature_names (List[str], optional): Names of the features for labeling internal nodes.
+        class_names (Dict[int, str], optional): Mapping from class indices to human-readable labels.
+        figsize (Tuple[float, float], optional): Custom figure size for the visualization.
+        filename (str, optional): Path to save the resulting tree plot.
+        x_spacing (float): Horizontal spacing multiplier between nodes.
+        y_spacing (float): Vertical spacing multiplier between levels.
+        leaf_gap_units (float): Extra horizontal spacing between leaves.
+        annotate_thresholds (bool): Whether to show threshold values (≤ / >) on connecting edges.
+    
+    - Process:
+        Uses a tidy layout from '_layout_tidy()' to compute node coordinates.
+        Draws the decision tree using Matplotlib:
+            • Connects parent and child nodes with edges.
+            • Labels edges with threshold conditions if enabled.
+            • Displays nodes as boxes showing either feature names (internal nodes)
+              or class predictions (leaf nodes).
+        Optionally saves the figure to a file if 'filename' is provided.
+    
+    - Return:
+        Tuple:
+            - fig (matplotlib.figure.Figure): The created figure object.
+            - ax (matplotlib.axes.Axes): The axis object containing the visualization.
     """
     if feature_names is None:
         feature_names = [f"A{i}" for i in range(7)]
