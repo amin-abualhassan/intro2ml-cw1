@@ -2,7 +2,16 @@ import argparse
 import numpy as np
 
 def load_wifi_dataset(path):
-    """Load the 2000x8 dataset. Returns X (N,7), y (N,) as ints."""
+    '''
+    Input:
+        path: path of the file (txt format) to load
+    Process:
+        Lad the file into 2 arrays:
+            X: the dataset features
+            y: the dataset class/label (the last column of the dataset) 
+    Return:
+        Tuple of array of feature (X) and array of class (Y)
+    '''
     arr = np.loadtxt(path)
     X = arr[:, :-1].astype(float)
     y = arr[:, -1].astype(int)
