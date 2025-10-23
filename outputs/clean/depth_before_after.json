@@ -1,8 +1,8 @@
 {
   "avg_depth_before": 12.2,
   "std_depth_before": 0.7483314773547883,
-  "avg_leavess_before": 41.3,
-  "std_leaves_before": 2.41039415863879,
+  "avg_leaf_before": 41.3,
+  "std_leaf_before": 2.41039415863879,
   "avg_depth_after": 8.8,
   "std_depth_after": 3.1874754901018454,
   "avg_leaf_after": 17.1,

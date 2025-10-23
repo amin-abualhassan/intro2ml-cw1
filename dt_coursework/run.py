@@ -71,8 +71,8 @@ def run_one(data_path, name, k, seed, make_figures):
     depth_stats = {
         "avg_depth_before": res_before["avg_depth_before"],
         "std_depth_before": res_before["std_depth_before"],
-        "avg_leavess_before": res_before["avg_leaf_before"],
-        "std_leaves_before": res_before["std_leaf_before"],
+        "avg_leaf_before": res_before["avg_leaf_before"],
+        "std_leaf_before": res_before["std_leaf_before"],
     }
 
     # AFTER pruning (nested 10-fold)
