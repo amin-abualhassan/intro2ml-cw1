@@ -97,7 +97,7 @@ def make_leaf(y, depth):
     }
 
 
-def decision_tree_learning(X, y, depth=0) -> Tuple[Node, int]:
+def decision_tree_learning(X, y, depth=0, num_of_leaf=0) -> Tuple[Node, int, int]:
     '''
     parameters:
     X (2D np.ndarray), y (1D array-like), depth (int, default 0)
@@ -113,7 +113,8 @@ def decision_tree_learning(X, y, depth=0) -> Tuple[Node, int]:
     # Stop if pure (single label)
     if len(labs) == 1:
         leaf = make_leaf(y, depth)
-        return leaf, depth
+        num_of_leaf += 1
+        return leaf, depth, num_of_leaf
 
     # Find best split across all features
     attr, thr, gain = find_split(X, y, labs)
@@ -121,7 +122,8 @@ def decision_tree_learning(X, y, depth=0) -> Tuple[Node, int]:
     # Stop if no split or no gain
     if attr is None or thr is None or gain <= 0.0:
         leaf = make_leaf(y, depth)
-        return leaf, depth
+        num_of_leaf += 1
+        return leaf, depth, num_of_leaf
 
     # Partition data by the chosen threshold
     left_mask = X[:, attr] <= thr
@@ -130,11 +132,12 @@ def decision_tree_learning(X, y, depth=0) -> Tuple[Node, int]:
     # Guard against degenerate split
     if left_mask.sum() == 0 or right_mask.sum() == 0:
         leaf = make_leaf(y, depth)
-        return leaf, depth
+        num_of_leaf += 1
+        return leaf, depth, num_of_leaf
 
     # Recurse on children
-    left_node, l_depth = decision_tree_learning(X[left_mask], y[left_mask], depth+1)
-    right_node, r_depth = decision_tree_learning(X[right_mask], y[right_mask], depth+1)
+    left_node, l_depth, l_num_of_leaf= decision_tree_learning(X[left_mask], y[left_mask], depth+1, num_of_leaf)
+    right_node, r_depth, r_num_of_leaf= decision_tree_learning(X[right_mask], y[right_mask], depth+1,num_of_leaf)
 
     # Build internal node
     node = {
@@ -148,7 +151,7 @@ def decision_tree_learning(X, y, depth=0) -> Tuple[Node, int]:
         "labels": labs.tolist(),
         "gain": float(gain),
     }
-    return node, max(l_depth, r_depth)
+    return node, max(l_depth, r_depth), l_num_of_leaf+r_num_of_leaf
 
 
 def predict_one(node: Node, x):
@@ -215,3 +218,19 @@ def tree_max_depth(node: Node):
     if node.get("leaf", False):
         return node.get("depth", 0)
     return max(tree_max_depth(node["left"]), tree_max_depth(node["right"]))
+
+def tree_count_leaves(node: Node, num_of_leaves=0):
+    '''
+    parameters:
+    node (Node)
+
+    functionality:
+    Compute the number of leaves recorded in the tree.
+
+    return:
+    int
+    '''
+    if node.get("leaf", True):
+        num_of_leaves += 1
+        return num_of_leaves
+    return tree_count_leaves(node["left"],num_of_leaves) + tree_count_leaves(node["right"],num_of_leaves)
