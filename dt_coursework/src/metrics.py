@@ -89,7 +89,7 @@ def metrics_summary(cm, labels):
     }
 
 def save_json(obj, path):
-   '''
+    '''
     parameters:
     obj (any): python object to save
     path (str): file path to save the JSON file

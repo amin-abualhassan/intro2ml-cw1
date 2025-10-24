@@ -138,6 +138,6 @@ def draw_tree(
 
     # Save figure if filename provided
     if filename:
-        fig.savefig(filename, dpi=150, bbox_inches="tight")
+        fig.savefig(filename, dpi=75, bbox_inches="tight")
 
     return fig, ax

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from src.data import load_wifi_dataset
 from src.cv import cross_validate
 from src.metrics import save_json
-from src.tree import decision_tree_learning
+from src.tree import decision_tree_learning, tree_count_leaves
 from src.visualize import draw_tree
 
 
@@ -74,6 +74,8 @@ def run_one(data_path, name, k, seed, make_figures):
     depth_stats = {
         "avg_depth_before": res_before["avg_depth_before"],
         "std_depth_before": res_before["std_depth_before"],
+        "avg_leaf_before": res_before["avg_leaf_before"],
+        "std_leaf_before": res_before["std_leaf_before"],
     }
 
     # AFTER pruning (nested 10-fold)
@@ -86,14 +88,19 @@ def run_one(data_path, name, k, seed, make_figures):
     depth_stats.update({
         "avg_depth_after": res_after["avg_depth_after"],
         "std_depth_after": res_after["std_depth_after"],
-        "median_chosen_passes": res_after.get("median_chosen_passes", 0)
+        "avg_leaf_after": res_after["avg_leaf_after"],
+        "std_leaf_after": res_after["std_leaf_after"],
+        "median_chosen_prune_passes": res_after.get("median_chosen_passes", 0)
     })
     save_json(depth_stats, os.path.join(out_dir, 'depth_before_after.json'))
 
     # Bonus: visualise full tree on the entire dataset (clean only, by default)
     if make_figures and name == 'clean':
-        full_tree, depth = decision_tree_learning(X, y, depth=0)
+        full_tree, depth, num_of_leaves = decision_tree_learning(X, y, depth=0)
         draw_tree(full_tree, filename=os.path.join(out_dir, 'tree_full_clean.png'))
+    if make_figures and name == 'noisy':
+        full_tree, depth, num_of_leaves = decision_tree_learning(X, y, depth=0)
+        draw_tree(full_tree, filename=os.path.join(out_dir, 'tree_full_noisy.png'))
 
 
 def main():
