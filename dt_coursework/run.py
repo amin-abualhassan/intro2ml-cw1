@@ -9,15 +9,16 @@ from src.metrics import save_json
 from src.tree import decision_tree_learning, tree_count_leaves
 from src.visualize import draw_tree
 
-'''
-parameters:
-  cm (2D np.ndarray), labels (list/array), title (str), path (str)
-functionality:
-  Plot a confusion matrix with labels, counts, and colorbar, then save to file.
-return:
-  None
-'''
+
 def plot_confusion(cm, labels, title, path):
+    '''
+    parameters:
+      cm (2D np.ndarray), labels (list|np.ndarray), title (str), path (str)
+    functionality:
+      Plot a confusion matrix with labels and counts, add a colorbar, and save to file.
+    return:
+      None
+    '''
     fig = plt.figure(figsize=(5, 4))
     ax = fig.add_subplot(111)
     im = ax.imshow(cm, interpolation='nearest')  # show matrix as image
@@ -37,27 +38,29 @@ def plot_confusion(cm, labels, title, path):
     fig.savefig(path, dpi=150)  # write image to disk
     plt.close(fig)              # free figure memory
 
-'''
-parameters:
-  p (str)
-functionality:
-  Create directory p if it does not exist.
-return:
-  None
-'''
+
 def ensure_dir(p):
+    '''
+    parameters:
+      p (str)
+    functionality:
+      Create directory p if it does not exist.
+    return:
+      None
+    '''
     os.makedirs(p, exist_ok=True)
 
-'''
-parameters:
-  data_path (str), name (str), k (int), seed (int), make_figures (bool)
-functionality:
-  Load data, run k-fold CV before and after pruning, save metrics and confusion plots,
-  dump depth stats, and optionally draw a full tree (clean dataset only).
-return:
-  None
-'''
+
 def run_one(data_path, name, k, seed, make_figures):
+    '''
+    parameters:
+      data_path (str), name (str), k (int), seed (int), make_figures (bool)
+    functionality:
+      Load data, run k-fold CV before/after pruning, save metrics and confusion plots, and depth stats.
+      Optionally draw a full tree for the clean dataset.
+    return:
+      None
+    '''
     X, y = load_wifi_dataset(data_path)  # load features and labels
     out_dir = os.path.join('outputs', name)
     ensure_dir(out_dir)
@@ -99,15 +102,16 @@ def run_one(data_path, name, k, seed, make_figures):
         full_tree, depth, num_of_leaves = decision_tree_learning(X, y, depth=0)
         draw_tree(full_tree, filename=os.path.join(out_dir, 'tree_full_noisy.png'))
 
-'''
-parameters:
-  None (reads CLI args)
-functionality:
-  Parse args, choose datasets to run, and invoke run_one per selection.
-return:
-  None
-'''
+
 def main():
+    '''
+    parameters:
+      None (reads CLI args)
+    functionality:
+      Parse args, select datasets, and run the workflow for each selection.
+    return:
+      None
+    '''
     ap = argparse.ArgumentParser()
     ap.add_argument('--clean', action='store_true', help='Use wifi_db/clean_dataset.txt')
     ap.add_argument('--noisy', action='store_true', help='Use wifi_db/noisy_dataset.txt')
@@ -130,6 +134,7 @@ def main():
 
     for path, name in to_run:
         run_one(path, name, args.k, args.seed, args.make_figures)
+
 
 if __name__ == '__main__':
     main()
