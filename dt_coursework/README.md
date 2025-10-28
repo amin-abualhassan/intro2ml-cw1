@@ -26,7 +26,7 @@ intro2ml-cw1/
 ├─ wifi_db/
 │  ├─ clean_dataset.txt
 │  └─ noisy_dataset.txt
-├─ outputs/                # these are created by the code
+├─ outputs/                # outputs are generated once the pipeline is executed
 ├─ requirements.txt
 └─ README.md
 ```
