@@ -126,18 +126,22 @@ python dt_coursework/run.py --data wifi_db/noisy_dataset.txt --k 10 --make-figur
 ```
 outputs/
   clean/
-    confusion_before.png
-    confusion_after.png
-    accuracy.png
-    recall.png
-    precision.png
-    f1.png
-    depth_and_leaves_comparison.png
-    tree_full_clean.png
+    cm_after.png
+    depth_before_after.json
     metrics_before.json
+    cm_before.png
     metrics_after.json
+    tree_full_clean.png # you need to zoom to see the tree details
+
   noisy/
-    ... same structure ...
+    cm_after.png
+    depth_before_after.json
+    metrics_before.json
+    cm_before.png
+    metrics_after.json
+    tree_full_noisy.png # you need to zoom a lot to see the tree details
+
+  ... same structure if code is ran for a custom dataset ...
 ```
 
 Use these artefacts to populate the report sections (Confusion matrix, Accuracy, per-class Recall & Precision, F1; and after pruning metrics).
