@@ -147,7 +147,7 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
             depths_after.append(depth_before)
             leaves_after.append(leaf_before)
 
-    summary_before = metrics_summary(agg_cm, labels)
+    summary_before = metrics_summary(agg_cm/k, labels)
 
     result: Dict[str, Any] = {
         "labels": [int(l) for l in labels],
@@ -200,7 +200,7 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
             depths_after.append(tree_max_depth(pruned_tree))
             leaves_after.append(tree_count_leaves(pruned_tree))
 
-        summary_after = metrics_summary(agg_cm_after, labels)
+        summary_after = metrics_summary(agg_cm_after/k, labels)
 
         result.update({
             "confusion_after": (agg_cm_after/k).tolist(),
