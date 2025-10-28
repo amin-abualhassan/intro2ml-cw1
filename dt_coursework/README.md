@@ -1,10 +1,10 @@
-# Intro to ML — Decision Trees (COMP70050)
+# Intro to ML: Decision Trees (COMP70050)
 
 From-scratch decision tree implementation for indoor room recognition from WiFi RSSI.
 
 - Continuous features, multi-class labels
 - 10-fold CV evaluation and pruning
-- Minimal deps: NumPy, Matplotlib, Python stdlib (no scikit-learn)
+- Used libraries: NumPy, Matplotlib, Python stdlib
 - Target Python: **3.12.x**
 
 ---
@@ -26,7 +26,7 @@ intro2ml-cw1/
 ├─ wifi_db/
 │  ├─ clean_dataset.txt
 │  └─ noisy_dataset.txt
-├─ outputs/                # created by scripts
+├─ outputs/                # these are created by the code
 ├─ requirements.txt
 └─ README.md
 ```
@@ -104,6 +104,9 @@ This will:
 python dt_coursework/run.py --clean --k 10 --make-figures
 # or
 python dt_coursework/run.py --noisy --k 10
+
+# or this for running the code on a custom dataset
+python dt_coursework/run.py --data wifi_db/noisy_dataset.txt --k 10 --make-figures
 ```
 
 ### Useful CLI flags
