@@ -9,6 +9,12 @@ From-scratch decision tree implementation for indoor room recognition from WiFi 
 
 ---
 
+## GitHub Repository
+
+GitHub Repository: [https://github.com/amin-abualhassan/intro2ml-cw1.git](https://github.com/amin-abualhassan/intro2ml-cw1.git)
+
+---
+
 ## Project Layout
 
 ```
@@ -50,6 +56,7 @@ source /vol/lab/ml/intro2ml/bin/activate
 # ... run code commands shown in the Quick Start section ...
 deactivate
 ```
+
 ### Option B — Create a local virtualenv (your laptop or custom env)
 
 macOS/Linux
@@ -64,7 +71,6 @@ pip install -r requirements.txt
 
 deactivate
 ```
-
 
 ---
 
@@ -87,17 +93,21 @@ This will:
 ### Only one dataset
 
 #### Clean Dataset
+
 ```bash
 python dt_coursework/run.py --clean --k 10 --make-figures
 ```
 
 #### Noisy Dataset
+
 ```bash
 python dt_coursework/run.py --noisy --k 10 --make-figures
 ```
 
 #### Custom Dataset
-# Running the code on a custom dataset located at custom_dataset_file_path
+
+Running the code on a custom dataset located at custom_dataset_file_path
+
 ```bash
 python dt_coursework/run.py --data custom_dataset_file_path --k 10 --make-figures
 ```

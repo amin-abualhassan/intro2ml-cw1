@@ -1,3 +1,0 @@
-# Only the allowed libraries for the coursework
-numpy>=1.20
-matplotlib>=3.5
