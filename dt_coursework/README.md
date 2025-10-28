@@ -64,14 +64,6 @@ pip install -r requirements.txt
 deactivate
 ```
 
-Windows (PowerShell)
-
-```powershell
-python -m venv venv
-.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
 
 ---
 
@@ -83,12 +75,6 @@ macOS/Linux
 
 ```bash
 python dt_coursework/run.py --clean --noisy --k 10 --make-figures
-```
-
-Windows (PowerShell)
-
-```powershell
-python dt_coursework\run.py --clean --noisy --k 10 --make-figures
 ```
 
 This will:
@@ -156,4 +142,3 @@ outputs/
 
 - Wrong Python / modules missing: activate the correct environment (Option A or B) and check `python --version`.
 - File not found: ensure `wifi_db/` exists and you are in the repo root.
-- Windows paths: use backslashes for the script path.
