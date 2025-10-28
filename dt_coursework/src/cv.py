@@ -151,7 +151,7 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
 
     result: Dict[str, Any] = {
         "labels": [int(l) for l in labels],
-        "confusion_before": agg_cm.tolist(),
+        "confusion_before": (agg_cm/k).tolist(),
         "metrics_before": summary_before,
         "avg_depth_before": float(np.mean(depths_before)),
         "std_depth_before": float(np.std(depths_before)),
@@ -203,7 +203,7 @@ def cross_validate(X, y, k=10, seed=42, prune=False, nested=False, inner_k=10):
         summary_after = metrics_summary(agg_cm_after, labels)
 
         result.update({
-            "confusion_after": agg_cm_after.tolist(),
+            "confusion_after": (agg_cm_after/k).tolist(),
             "metrics_after": summary_after,
             "avg_depth_after": float(np.mean(depths_after)),
             "std_depth_after": float(np.std(depths_after)),
