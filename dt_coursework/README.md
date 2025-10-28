@@ -46,12 +46,9 @@ wifi_db/noisy_dataset.txt
 
 ```bash
 source /vol/lab/ml/intro2ml/bin/activate
-# ... run your commands ...
+# ... run code commands shown in the Quick Start section ...
 deactivate
 ```
-
-This environment matches the lab setup and already includes the required packages.
-
 ### Option B — Create a local virtualenv (your laptop or custom env)
 
 macOS/Linux
@@ -61,6 +58,10 @@ python3 -m venv venv
 source venv/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+
+# ... run code commands shown in the Quick Start section ...
+
+deactivate
 ```
 
 Windows (PowerShell)
@@ -71,8 +72,6 @@ python -m venv venv
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
-
-> Tip: don’t commit `venv/` to git (it’s in `.gitignore`).
 
 ---
 
@@ -144,8 +143,6 @@ outputs/
   ... same structure if code is ran for a custom dataset ...
 ```
 
-Use these artefacts to populate the report sections (Confusion matrix, Accuracy, per-class Recall & Precision, F1; and after pruning metrics).
-
 ---
 
 ## Reproducibility
@@ -159,4 +156,4 @@ Use these artefacts to populate the report sections (Confusion matrix, Accuracy,
 
 - Wrong Python / modules missing: activate the correct environment (Option A or B) and check `python --version`.
 - File not found: ensure `wifi_db/` exists and you are in the repo root.
-- Windows paths: use backslashes for the script path (as shown above).
+- Windows paths: use backslashes for the script path.
