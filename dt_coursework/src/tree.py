@@ -81,9 +81,7 @@ def make_leaf(y, depth):
     return:
     Node (dict)
     '''
-    counts = label_counts(y)
-    pred = int(np.argmax(counts) + 1)  # quick placeholder (labels assumed 1..K here)
-
+    
     # Correct prediction using the actual labels present in y
     labs = unique_labels(y)
     pred = int(labs[np.argmax(label_counts(y, labs))])

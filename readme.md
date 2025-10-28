@@ -97,7 +97,7 @@ python dt_coursework/run.py --noisy --k 10
 ```
 
 #### Custom Dataset
-# Running the code on a custom dataset located at custom_dataset_file_path
+Running the code on a custom dataset located at custom_dataset_file_path
 ```bash
 python dt_coursework/run.py --data custom_dataset_file_path --k 10 --make-figures
 ```

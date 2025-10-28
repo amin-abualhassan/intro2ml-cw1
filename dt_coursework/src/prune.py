@@ -2,8 +2,7 @@ from __future__ import annotations
 import copy
 import numpy as np
 from typing import Tuple, Dict, Any, List
-from .tree import predict, tree_max_depth
-from .utils import majority_label
+from src.tree import predict, tree_max_depth
 
 Node = Dict[str, Any]
 
@@ -67,11 +66,12 @@ def _prune_node_in_place(node: Node):
             right_pred = node["right"].get("prediction", None)
             pred = left_pred if left_pred is not None else right_pred
         pred = int(pred)
+    depth = node.get("depth", 0)
     node.clear()
     node.update({
         "leaf": True,
         "prediction": pred,
-        "depth": node.get("depth", 0),
+        "depth": depth,
     })
 
 def prune_one_pass(node: Node, X_val: np.ndarray, y_val: np.ndarray) -> int:

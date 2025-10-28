@@ -1,10 +1,9 @@
 from __future__ import annotations
 import numpy as np
 from typing import Dict, Any
-from .tree import decision_tree_learning, predict, tree_max_depth, tree_count_leaves
-from .metrics import confusion_matrix, metrics_summary
-from .prune import count_passes_to_converge, prune_with_passes
-from src.visualize import draw_tree
+from src.tree import decision_tree_learning, predict, tree_max_depth, tree_count_leaves
+from src.metrics import confusion_matrix, metrics_summary
+from src.prune import count_passes_to_converge, prune_with_passes
 
 def kfold_indices(n, k=10, seed=42, shuffle=True):
     '''
