@@ -120,8 +120,8 @@ def main():
     ap.add_argument('--seed', type=int, default=42)
     ap.add_argument('--make-figures', action='store_true', help='Also save confusion matrix images and tree figure (clean).')
     args = ap.parse_args()
-
     to_run = []
+    print('Generating Decision Trees and Reports...')
     if args.data:
         # use custom path; name from file stem
         to_run.append((args.data, os.path.splitext(os.path.basename(args.data))[0]))
@@ -134,6 +134,8 @@ def main():
 
     for path, name in to_run:
         run_one(path, name, args.k, args.seed, args.make_figures)
+
+    print('Done :)')
 
 
 if __name__ == '__main__':
