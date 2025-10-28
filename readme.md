@@ -22,7 +22,8 @@ intro2ml-cw1/
 │     ├─ prune.py
 │     ├─ tree.py
 │     ├─ utils.py
-│     └─ visualize.py
+│     ├─ visualize.py
+│     └─ analytics.ipynb  # python notebook to analyze the decision tree result (for the report)
 ├─ wifi_db/
 │  ├─ clean_dataset.txt
 │  └─ noisy_dataset.txt
@@ -90,8 +91,8 @@ python dt_coursework/run.py --clean --k 10 --make-figures
 # or
 python dt_coursework/run.py --noisy --k 10
 
-# or this for running the code on a custom dataset
-python dt_coursework/run.py --data wifi_db/noisy_dataset.txt --k 10 --make-figures
+# or this for running the code on a custom dataset located at custom_dataset_file_path
+python dt_coursework/run.py --data custom_dataset_file_path --k 10 --make-figures
 ```
 
 ### Useful CLI flags
