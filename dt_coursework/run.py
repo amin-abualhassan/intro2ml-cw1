@@ -61,11 +61,16 @@ def run_one(data_path, name, k, seed, make_figures):
     return:
       None
     '''
+    print(f"\n---STARTING RUN: Dataset '{name}' (k={k}, seed={seed}) ---")
     X, y = load_wifi_dataset(data_path)  # load features and labels
+
+    print(f"Data loaded: {X.shape[0]} samples, {X.shape[1]} features.")
     out_dir = os.path.join('outputs', name)
     ensure_dir(out_dir)
+    print(f"Output directory set up: {out_dir}")
 
     # BEFORE pruning
+    print(f"\n---STEP 1: Cross-Validation BEFORE Pruning ---")
     res_before = cross_validate(X, y, k=k, seed=seed, prune=False, nested=False)
     save_json(res_before['metrics_before'], os.path.join(out_dir, 'metrics_before.json'))
     cm_before = np.array(res_before['confusion_before'])
@@ -79,6 +84,7 @@ def run_one(data_path, name, k, seed, make_figures):
     }
 
     # AFTER pruning (nested 10-fold)
+    print(f"\n---STEP 2: Nested Cross-Validation AFTER Pruning ---")
     res_after = cross_validate(X, y, k=k, seed=seed, prune=True, nested=True, inner_k=10)
     save_json(res_after['metrics_after'], os.path.join(out_dir, 'metrics_after.json'))
     cm_after = np.array(res_after['confusion_after'])
@@ -96,9 +102,11 @@ def run_one(data_path, name, k, seed, make_figures):
 
     # Bonus: visualise full tree on the entire dataset (clean only, by default)
     if make_figures and name == 'clean':
+        print(f"\n---STEP 3: Generating full tree visualization for CLEAN dataset ---")
         full_tree, depth, num_of_leaves = decision_tree_learning(X, y, depth=0)
         draw_tree(full_tree, filename=os.path.join(out_dir, 'tree_full_clean.png'))
     if make_figures and name == 'noisy':
+        print(f"\n---STEP 3: Generating full tree visualization for NOISY dataset ---")
         full_tree, depth, num_of_leaves = decision_tree_learning(X, y, depth=0)
         draw_tree(full_tree, filename=os.path.join(out_dir, 'tree_full_noisy.png'))
 
