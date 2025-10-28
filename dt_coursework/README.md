@@ -5,7 +5,7 @@ From-scratch decision tree implementation for indoor room recognition from WiFi 
 - Continuous features, multi-class labels
 - 10-fold CV evaluation and pruning
 - Used libraries: NumPy, Matplotlib, Python stdlib
-- Target Python: **3.12.x**
+- Target Python: 3.12.x
 
 ---
 
@@ -31,7 +31,7 @@ intro2ml-cw1/
 └─ README.md
 ```
 
-**Datasets** should be located at:
+Datasets should be located at:
 
 ```
 wifi_db/clean_dataset.txt
@@ -54,7 +54,7 @@ This environment matches the lab setup and already includes the required package
 
 ### Option B — Create a local virtualenv (your laptop or custom env)
 
-**macOS/Linux**
+macOS/Linux
 
 ```bash
 python3 -m venv venv
@@ -63,11 +63,11 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-**Windows (PowerShell)**
+Windows (PowerShell)
 
 ```powershell
 python -m venv venv
-.env\Scripts\Activate.ps1
+.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
@@ -80,13 +80,13 @@ pip install -r requirements.txt
 
 Run from the repo root (where `wifi_db/` lives).
 
-**macOS/Linux**
+macOS/Linux
 
 ```bash
 python dt_coursework/run.py --clean --noisy --k 10 --make-figures
 ```
 
-**Windows (PowerShell)**
+Windows (PowerShell)
 
 ```powershell
 python dt_coursework\run.py --clean --noisy --k 10 --make-figures
@@ -94,7 +94,7 @@ python dt_coursework\run.py --clean --noisy --k 10 --make-figures
 
 This will:
 
-- Train/evaluate with 10-fold CV on **clean** and **noisy**
+- Train/evaluate with 10-fold CV on clean and noisy
 - Perform pruning (if enabled in the code)
 - Save figures/metrics in `outputs/`
 
@@ -153,6 +153,6 @@ Use these artefacts to populate the report sections (Confusion matrix, Accuracy,
 
 ## Troubleshooting
 
-- **Wrong Python / modules missing**: activate the correct environment (Option A or B) and check `python --version`.
-- **File not found**: ensure `wifi_db/` exists and you are in the repo root.
-- **Windows paths**: use backslashes for the script path (as shown above).
+- Wrong Python / modules missing: activate the correct environment (Option A or B) and check `python --version`.
+- File not found: ensure `wifi_db/` exists and you are in the repo root.
+- Windows paths: use backslashes for the script path (as shown above).
