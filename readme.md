@@ -101,7 +101,7 @@ python dt_coursework/run.py --clean --k 10 --make-figures
 #### Noisy Dataset
 
 ```bash
-python dt_coursework/run.py --noisy --k 10 --make-figures
+python dt_coursework/run.py --noisy --k 10
 ```
 
 #### Custom Dataset
@@ -109,7 +109,7 @@ python dt_coursework/run.py --noisy --k 10 --make-figures
 Running the code on a custom dataset located at custom_dataset_file_path
 
 ```bash
-python dt_coursework/run.py --data custom_dataset_file_path --k 10 --make-figures
+python dt_coursework/run.py --data custom_dataset_file_path --k 10
 ```
 
 ### Useful CLI flags
@@ -119,7 +119,7 @@ python dt_coursework/run.py --data custom_dataset_file_path --k 10 --make-figure
 --data PATH            # custom dataset .txt (overrides the above)
 --k 10                 # number of CV folds (default: 10)
 --seed 42              # RNG seed (default: 42)
---make-figures         # write plots to outputs/
+--make-figures         # write decision tree to outputs, only supported for the clean data
 ```
 
 ---
@@ -142,7 +142,6 @@ outputs/
     metrics_before.json
     cm_before.png
     metrics_after.json
-    tree_full_noisy.png # you need to zoom a lot to see the tree details
 
   ... same structure if code is ran for a custom dataset ...
 ```

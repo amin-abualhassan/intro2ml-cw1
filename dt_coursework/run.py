@@ -107,12 +107,14 @@ def run_one(data_path, name, k, seed, make_figures):
         draw_tree(full_tree, filename=os.path.join(out_dir, 'tree_full_clean.png'))
     elif make_figures and name == 'noisy':
         print(f"\n---STEP 3: Generating full tree visualization for the NOISY dataset ---")
-        full_tree, depth, num_of_leaves = decision_tree_learning(X, y, depth=0)
-        draw_tree(full_tree, filename=os.path.join(out_dir, 'tree_full_noisy.png'))
+        print("Decision tree visualization is currently not supported for non clean data")
+        # full_tree, depth, num_of_leaves = decision_tree_learning(X, y, depth=0)
+        # draw_tree(full_tree, filename=os.path.join(out_dir, 'tree_full_noisy.png'))
     else:
         print(f"\n---STEP 3: Generating full tree visualization for the CUSTOM dataset ---")
-        full_tree, depth, num_of_leaves = decision_tree_learning(X, y, depth=0)
-        draw_tree(full_tree, filename=os.path.join(out_dir, 'tree_full_custom.png'))
+        print("Decision tree visualization is currently not supported for non clean data")
+        # full_tree, depth, num_of_leaves = decision_tree_learning(X, y, depth=0)
+        # draw_tree(full_tree, filename=os.path.join(out_dir, 'tree_full_custom.png'))
 
 def main():
     '''
